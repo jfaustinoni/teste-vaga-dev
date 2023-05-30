@@ -14,11 +14,11 @@
                 <h5 class="card-title">Formulário de Cadastro</h5>
             </div>
             <div class="card-body">
-                <form method="POST" action="/companies">
+                <form id="form-companies">
                     <div class="row">
                         <div class="col-3">
-                            <label for="cnpj" class="form-label">CNPJ</label>
-                            <input type="text" class="form-control" id="cnpj" name="cnpj">
+                            <label for="registration_number" class="form-label">CNPJ</label>
+                            <input type="text" class="form-control" id="registration_number" name="registration_number">
                         </div>
                         <div class="col-9">
                             <label for="name" class="form-label">Nome da Empresa</label>
@@ -28,8 +28,8 @@
 
                     <div class="row">
                         <div class="col-2">
-                            <label for="cep" class="form-label">CEP</label>
-                            <input type="text" class="form-control" id="cep" name="cep">
+                            <label for="postal_code" class="form-label">CEP</label>
+                            <input type="text" class="form-control" id="postal_code" name="postal_code">
                         </div>
                         <div class="col-9">
                             <label for="address" class="form-label">Endereço</label>
@@ -62,7 +62,7 @@
                     <div class="row justify-content-end mt-3">
                         <div class="col-4 d-flex justify-content-end">
                             <button type="button" class="btn btn-secondary">Cancelar</button>
-                            <button type="submit" class="btn btn-primary ms-4">Salvar</button>
+                            <button type="submit" class="btn btn-primary ms-4" id="save">Salvar</button>
                         </div>
                     </div>
                 </form>
@@ -82,11 +82,13 @@
             </tr>
             </thead>
             <tbody>
-            <tr>
-                <td>123456789</td>
-                <td>Empresa 1</td>
-                <td><a href="">Edit</a> </td>
-            </tr>
+                <?php foreach ($companies as $company) { ?>
+                    <tr>
+                        <td><?php echo $company['registration_number']?></td>
+                        <td><?php echo $company['name']?></td>
+                        <td><a href="">Edit</a></td>
+                    </tr>
+                <?php } ?>
             </tbody>
         </table>
     </div>
@@ -126,6 +128,35 @@
                 option.value = data[i].id;
                 option.text = data[i].nome;
                 cidadesSEL.insertAdjacentElement('beforeend',option);
+            }
+        });
+    });
+</script>
+<script>
+
+    $( "#save" ).on( "click", function(e) {
+        e.preventDefault();
+
+        var formData = {
+            registration_number: $('#registration_number').val(),
+            name: $('#name').val(),
+            postal_code: $('#postal_code').val(),
+            address: $('#address').val(),
+            number: $('#number').val(),
+            district: $('#district').val(),
+            states: $('#states').val(),
+            cities: $('#cities').val(),
+        };
+
+        $.ajax({
+            type: "POST",
+            url: "http://localhost/teste-vaga-dev/companies",
+            data: formData,
+            success: function(response) {
+                console.log(formData);
+            },
+            error: function(xhr, status, error) {
+                console.error(error);
             }
         });
     });
