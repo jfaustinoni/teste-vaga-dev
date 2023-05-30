@@ -14,7 +14,7 @@
                 <h5 class="card-title">Formulário de Cadastro</h5>
             </div>
             <div class="card-body">
-                <form>
+                <form method="POST" action="/companies">
                     <div class="row">
                         <div class="col-3">
                             <label for="cnpj" class="form-label">CNPJ</label>
@@ -47,21 +47,15 @@
                             <input type="text" class="form-control" id="district" name="district">
                         </div>
                         <div class="col-2">
-                            <label for="address" class="form-label">UF</label>
-                            <select class="form-select" aria-label="Default select example">
-                                <option selected>Open this select menu</option>
-                                <option value="1">One</option>
-                                <option value="2">Two</option>
-                                <option value="3">Three</option>
+                            <label for="states" class="form-label">UF</label>
+                            <select  class="form-select" id="states">
+                                <option value="" selected>Escolha o estado</option>
                             </select>
                         </div>
                         <div class="col-3">
-                            <label for="number" class="form-label">Cidade</label>
-                            <select class="form-select" aria-label="Default select example">
-                                <option selected>Open this select menu</option>
-                                <option value="1">One</option>
-                                <option value="2">Two</option>
-                                <option value="3">Three</option>
+                            <label for="cities" class="form-label">Cidade</label>
+                            <select  class="form-select" id="cities">
+                                <option value="" selected>Escolha a cidade</option>
                             </select>
                         </div>
                     </div>
@@ -97,6 +91,44 @@
         </table>
     </div>
 </section>
+<script src="https://code.jquery.com/jquery-3.7.0.js" integrity="sha256-JlqSTELeR4TLqP0OG9dxM7yDPqX1ox/HfgiSLBj8+kM=" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe" crossorigin="anonymous"></script>
+<script>
+    const cidadesSEL = document.getElementById("cities");
+    const estadosSEL = document.getElementById("states");
+    const viaCepUrl = 'https://viacep.com.br/ws/json/'
+    const ibgeAPI = 'https://servicodados.ibge.gov.br/api/v1/localidades/estados';
+    let option;
+
+    fetch(ibgeAPI).then(function(response) {
+        return response.json();
+    }).then(function(data) {
+        for (let i in data) {
+            option = document.createElement("option");
+            option.value = data[i].id;
+            option.text = data[i].nome;
+            option.setAttribute('data-sigla' , data[i].sigla);
+            estadosSEL.insertAdjacentElement('beforeend',option);
+        }
+        option = document.createElement("option");
+        estadosSEL.insertAdjacentElement('beforeend',option);
+    });
+
+    estadosSEL.addEventListener("change", () => {
+        cidadesSEL.innerHTML = '';
+        cidadesSEL.style.display = "inline";
+
+        fetch(ibgeAPI + '/' + estadosSEL.value + '/municipios').then(function(response) {
+            return response.json();
+        }).then(function(data) {
+            for (let i in data) {
+                let option = document.createElement("option");
+                option.value = data[i].id;
+                option.text = data[i].nome;
+                cidadesSEL.insertAdjacentElement('beforeend',option);
+            }
+        });
+    });
+</script>
 </body>
 </html>
