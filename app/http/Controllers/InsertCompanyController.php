@@ -2,7 +2,8 @@
 
 class InsertCompanyController
 {
-    public function index() {
+    public function index()
+    {
         $request = Flight::request();
         $registrationNumber = $request->data['registration_number'];
         $name = $request->data['name'];
@@ -14,9 +15,9 @@ class InsertCompanyController
         $cities = $request->data['cities'];
 
         $insert = Flight::db()->prepare('INSERT INTO companies (registration_number, name, postal_code, address, number, district, state, city) VALUES (?, ?,?,?,?,?,?,?)');
-        $insert->execute([$registrationNumber, $name,$postalCode, $address, $number, $district, $states, $cities]);
+        $insert->execute([$registrationNumber, $name, $postalCode, $address, $number, $district, $states, $cities]);
 
-        if($insert){
+        if ($insert) {
             Flight::json([
                 'message' => 'Empresa cadastrada com sucesso!',
                 'data' => json_encode(array($request->data))

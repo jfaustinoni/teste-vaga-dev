@@ -1,14 +1,9 @@
 <?php
 
-
-
 Flight::route('/', function(){
-    //List companies
     $listCompaniesController = new ListCompaniesController();
     $companies = $listCompaniesController->index();
-
     Flight::render('layout.php', array('companies' => $companies));
-
 });
 
 Flight::route('POST /companies', function(){
