@@ -1,3 +1,5 @@
+$( document ).ready(function() {
+});
 //Init datatable
 $('#myTable').DataTable({
     ordering: false,
@@ -130,3 +132,39 @@ var editData = function (id) {
     });
 };
 
+//Select state and city
+const cidadesSEL = document.getElementById("cities");
+const estadosSEL = document.getElementById("states");
+const viaCepUrl = 'https://viacep.com.br/ws/json/'
+const ibgeAPI = 'https://servicodados.ibge.gov.br/api/v1/localidades/estados';
+let option;
+
+fetch(ibgeAPI).then(function(response) {
+    return response.json();
+}).then(function(data) {
+    for (let i in data) {
+        option = document.createElement("option");
+        option.value = data[i].id;
+        option.text = data[i].nome;
+        option.setAttribute('data-sigla' , data[i].sigla);
+        estadosSEL.insertAdjacentElement('beforeend',option);
+    }
+    option = document.createElement("option");
+    estadosSEL.insertAdjacentElement('beforeend',option);
+});
+
+estadosSEL.addEventListener("change", () => {
+    cidadesSEL.innerHTML = '';
+    cidadesSEL.style.display = "inline";
+
+    fetch(ibgeAPI + '/' + estadosSEL.value + '/municipios').then(function(response) {
+        return response.json();
+    }).then(function(data) {
+        for (let i in data) {
+            let option = document.createElement("option");
+            option.value = data[i].id;
+            option.text = data[i].nome;
+            cidadesSEL.insertAdjacentElement('beforeend',option);
+        }
+    });
+});
