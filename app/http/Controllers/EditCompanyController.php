@@ -15,8 +15,8 @@ class EditCompanyController
       $cities = $request->data['cities'];
       $id = $request->data['id'];
 
-      $query = Flight::db()->prepare('UPDATE companies SET registration_number = :registration_number, name = :name, postal_code = :postal_code,address = :address,number = :number,district = :district,state = :state,city = :city WHERE id = :id');
-      $query->execute(array(
+      $edit = Flight::db()->prepare('UPDATE companies SET registration_number = :registration_number, name = :name, postal_code = :postal_code,address = :address,number = :number,district = :district,state = :state,city = :city WHERE id = :id');
+      $edit->execute(array(
           ':registration_number' => $registrationNumber,
           ':name' => $name,
           ':postal_code' => $postalCode,
@@ -27,5 +27,12 @@ class EditCompanyController
           ':city' => $cities,
           ':id' => $id
       ));
+
+      if($edit){
+          Flight::json([
+              'message' => 'Empresa editada com sucesso!',
+              'data' => json_encode(array($request->data))
+          ]);
+      }
   }
 }

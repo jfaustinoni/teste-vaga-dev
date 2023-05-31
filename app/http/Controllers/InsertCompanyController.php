@@ -16,5 +16,11 @@ class InsertCompanyController
         $insert = Flight::db()->prepare('INSERT INTO companies (registration_number, name, postal_code, address, number, district, state, city) VALUES (?, ?,?,?,?,?,?,?)');
         $insert->execute([$registrationNumber, $name,$postalCode, $address, $number, $district, $states, $cities]);
 
+        if($insert){
+            Flight::json([
+                'message' => 'Empresa cadastrada com sucesso!',
+                'data' => json_encode(array($request->data))
+            ]);
+        }
     }
 }
