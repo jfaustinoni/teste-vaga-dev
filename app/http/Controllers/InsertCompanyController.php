@@ -1,6 +1,6 @@
 <?php
 
-class InsertCompaniesController
+class InsertCompanyController
 {
     public function index() {
         $request = Flight::request();

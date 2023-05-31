@@ -15,6 +15,7 @@
             </div>
             <div class="card-body">
                 <form id="form-companies">
+                    <input type="text" name="id" id="updateId">
                     <div class="row">
                         <div class="col-3">
                             <label for="registration_number" class="form-label">CNPJ</label>
@@ -48,13 +49,13 @@
                         </div>
                         <div class="col-2">
                             <label for="states" class="form-label">UF</label>
-                            <select  class="form-select" id="states">
+                            <select  class="form-select" id="states" name="state">
                                 <option value="" selected>Escolha o estado</option>
                             </select>
                         </div>
                         <div class="col-3">
                             <label for="cities" class="form-label">Cidade</label>
-                            <select  class="form-select" id="cities">
+                            <select class="form-select" id="cities" name="city">
                                 <option value="" selected>Escolha a cidade</option>
                             </select>
                         </div>
@@ -62,7 +63,8 @@
                     <div class="row justify-content-end mt-3">
                         <div class="col-4 d-flex justify-content-end">
                             <button type="button" class="btn btn-secondary">Cancelar</button>
-                            <button type="submit" class="btn btn-primary ms-4" id="save">Salvar</button>
+                            <button type="button" class="btn btn-primary ms-4" id="save">Salvar</button>
+                            <button type="button" class="btn btn-primary ms-4" id="edit" hidden>Salvar</button>
                         </div>
                     </div>
                 </form>
@@ -86,7 +88,7 @@
                     <tr>
                         <td><?php echo $company['registration_number']?></td>
                         <td><?php echo $company['name']?></td>
-                        <td><a href="">Edit</a></td>
+                        <td><a href='javascript:void(0)' onclick="editData(<?php echo $company['id']?>)">Edit</a></td>
                     </tr>
                 <?php } ?>
             </tbody>
@@ -133,7 +135,6 @@
     });
 </script>
 <script>
-
     $( "#save" ).on( "click", function(e) {
         e.preventDefault();
 
@@ -144,8 +145,8 @@
             address: $('#address').val(),
             number: $('#number').val(),
             district: $('#district').val(),
-            states: $('#states').val(),
-            cities: $('#cities').val(),
+            states: $( "#states option:selected" ).text(),
+            cities:$( "#cities option:selected" ).text(),
         };
 
         $.ajax({
@@ -160,6 +161,86 @@
             }
         });
     });
+
+
+    $("#edit").on( "click", function(e) {
+        e.preventDefault();
+        var formData = {
+            registration_number: $('#registration_number').val(),
+            name: $('#name').val(),
+            postal_code: $('#postal_code').val(),
+            address: $('#address').val(),
+            number: $('#number').val(),
+            district: $('#district').val(),
+            states: $( "#states option:selected" ).text(),
+            cities:$( "#cities option:selected" ).text(),
+            id: $("#updateId").val()
+        };
+
+        $.ajax({
+            type: "POST",
+            url: "http://localhost/teste-vaga-dev/edit-companies",
+            data: formData,
+            success: function(response) {
+                console.log(formData);
+            },
+            error: function(xhr, status, error) {
+                console.error(error);
+            }
+        });
+    });
+
+    var editData = function(id){
+        $('#save').attr("hidden",true);
+        $('#edit').attr("hidden",false);
+        $.ajax({
+            type: "GET",
+            url: "http://localhost/teste-vaga-dev/companies/"+id,
+            data:{editId:id},
+            dataType: "html",
+            success: function(data){
+                var companyData = JSON.parse(data);
+                // console.log(companyData);
+
+                $("input[name='address']").val(companyData.address);
+                $("input[name='id']").val(companyData.id);
+                $("input[name='district']").val(companyData.district);
+                $("input[name='name']").val(companyData.name);
+                $("input[name='number']").val(companyData.number);
+                $("input[name='postal_code']").val(companyData.postal_code);
+                $("input[name='registration_number']").val(companyData.registration_number);
+
+                $("#states > option").filter(function() {
+                    return $(this).text() == companyData.state;
+                }).prop("selected", true);
+
+                $("#cities > option").filter(function(e) {
+
+                    const cidadesSEL = document.getElementById("cities");
+                    const estadosSEL = document.getElementById("states");
+                    const viaCepUrl = 'https://viacep.com.br/ws/json/'
+                    const ibgeAPI = 'https://servicodados.ibge.gov.br/api/v1/localidades/estados';
+                    let option;
+
+                    cidadesSEL.innerHTML = '';
+                    cidadesSEL.style.display = "inline";
+
+                    fetch(ibgeAPI + '/' + estadosSEL.value + '/municipios').then(function(response) {
+                        return response.json();
+                    }).then(function(data) {
+                        for (let i in data) {
+                            let option = document.createElement("option");
+                            option.value = data[i].id;
+                            option.text = data[i].nome;
+                            cidadesSEL.insertAdjacentElement('beforeend', option);
+                        }
+                        $("#cities > option:contains('"+companyData.city+"')" ).prop("selected", true);
+                    });
+                });
+            }
+        });
+    };
+
 </script>
 </body>
 </html>
